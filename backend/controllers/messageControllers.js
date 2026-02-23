@@ -1,5 +1,6 @@
 import { Chat } from "../models/ChatModel.js";
 import { Messages } from "../models/Messages.js";
+import { getReciverSocketId, io } from "../socket/socket.js";
 import TryCatch from "../utils/Trycatch.js";
 
 export const sendMessage = TryCatch(async (req, res) => {
@@ -42,6 +43,13 @@ export const sendMessage = TryCatch(async (req, res) => {
       sender: senderId,
     },
   });
+
+  const reciverSocketId = getReciverSocketId(recieverId);
+
+  if (reciverSocketId) {
+    io.to(reciverSocketId).emit("newMessage", newMessage);
+  }
+
   res.status(201).json(newMessage);
 });
 
@@ -64,26 +72,3 @@ export const getAllMessages = TryCatch(async (req, res) => {
 
   res.json(messages);
 });
-
-export const getAllChats=TryCatch(async (req, res) => {
-  try {
-    const chats = await Chat.find({
-      users: req.user._id,
-    }).populate({
-      path: "users",
-      select: "name profilePic",
-    });
-
-    chats.forEach((e) => {
-      e.users = e.users.filter(
-        (user) => user._id.toString() !== req.user._id.toString()
-      );
-    });
-
-    res.json(chats);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-})
