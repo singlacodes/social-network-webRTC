@@ -90,6 +90,7 @@ const MessageContainer = ({ selectedChat, setChats }) => {
                 {messages &&
                   messages.map((e) => (
                     <Message
+                      key={e._id}
                       message={e.text}
                       ownMessage={e.sender === user._id && true}
                     />

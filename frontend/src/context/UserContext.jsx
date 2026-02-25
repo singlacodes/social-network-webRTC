@@ -8,6 +8,7 @@ export const UserContextProvider = ({ children }) => {
   const [user, setUser] = useState([]);
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
+
   async function registerUser(formdata, navigate, fetchPosts) {
     setLoading(true);
     try {
@@ -74,6 +75,39 @@ export const UserContextProvider = ({ children }) => {
       toast.error(error.response.data.message);
     }
   }
+
+  async function followUser(id, fetchUser) {
+    try {
+      const { data } = await axios.post("/api/user/follow/" + id);
+
+      toast.success(data.message);
+      fetchUser();
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  }
+
+  async function updateProfilePic(id, formdata, setFile) {
+    try {
+      const { data } = await axios.put("/api/user/" + id, formdata);
+      toast.success(data.message);
+      fetchUser();
+      setFile(null);
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  }
+  async function updateProfileName(id, name, setShowInput) {
+    try {
+      const { data } = await axios.put("/api/user/" + id, { name });
+      toast.success(data.message);
+      fetchUser();
+      setShowInput(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  }
+
   useEffect(() => {
     fetchUser();
   }, []);
@@ -88,6 +122,9 @@ export const UserContextProvider = ({ children }) => {
         loading,
         logoutUser,
         registerUser,
+        followUser,
+        updateProfilePic,
+        updateProfileName,
       }}
     >
       {children}
