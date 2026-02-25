@@ -11,12 +11,15 @@ import { app, server } from "./socket/socket.js";
 import path from "path";
 import axios from 'axios';
 
-const url = `https://mern-social-3e3m.onrender.com`;
+dotenv.config();
+
+// Keep-alive ping to prevent server from sleeping (optional)
 const interval = 30000;
+const RENDER_URL = process.env.RENDER_URL || `https://social-network-webrtc.onrender.com`;
 
 function reloadWebsite() {
   axios
-    .get(url)
+    .get(RENDER_URL)
     .then((response) => {
       console.log(
         `Reloaded at ${new Date().toISOString()}: Status Code ${
@@ -32,9 +35,10 @@ function reloadWebsite() {
     });
 }
 
-setInterval(reloadWebsite, interval);
-
-dotenv.config();
+// Only enable keep-alive in production
+if (process.env.NODE_ENV === 'production') {
+  setInterval(reloadWebsite, interval);
+}
 
 cloudinary.v2.config({
   cloud_name: process.env.Cloudinary_Cloud_Name,
@@ -43,14 +47,33 @@ cloudinary.v2.config({
 });
 
 //using middlewares
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://social-network-webrtc.onrender.com"
+];
+
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser());
 
 const port = process.env.PORT;
+
+// Health check endpoint
+app.get("/", (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is running" });
+});
 
 // to get all chats of user
 app.get("/api/messages/chats", isAuth, async (req, res) => {
@@ -112,10 +135,10 @@ const __dirname = path.resolve();
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-// Catch-all route for production - comment out during development
-// app.get("/*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
-// });
+// Catch-all route for production
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+});
 
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
