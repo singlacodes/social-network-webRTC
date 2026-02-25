@@ -6,6 +6,10 @@ import { UserContextProvider } from "./context/UserContext.jsx";
 import { PostContextProvider } from "./context/PostContext.jsx";
 import { ChatContextProvider } from "./context/ChatContext.jsx";
 import { SocketContextProvider } from "./context/SocketContext.jsx";
+import axios from "axios";
+
+// Configure axios to send cookies with every request
+axios.defaults.withCredentials = true;
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { connectDb } from "./database/db.js";
 import cloudinary from "cloudinary";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import { Chat } from "./models/ChatModel.js";
 import { isAuth } from "./middlewares/isAuth.js";
 import { User } from "./models/userModel.js";
@@ -42,6 +43,10 @@ cloudinary.v2.config({
 });
 
 //using middlewares
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -107,9 +112,10 @@ const __dirname = path.resolve();
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
-});
+// Catch-all route for production - comment out during development
+// app.get("/*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+// });
 
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
