@@ -5,7 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 const UserContext = createContext();
 
 export const UserContextProvider = ({ children }) => {
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -67,7 +67,7 @@ export const UserContextProvider = ({ children }) => {
 
       if (data.message) {
         toast.success(data.message);
-        setUser([]);
+        setUser(null);
         setIsAuth(false);
         navigate("/login");
       }
