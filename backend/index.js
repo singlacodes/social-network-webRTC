@@ -15,7 +15,7 @@ dotenv.config();
 
 // Keep-alive ping to prevent server from sleeping (optional)
 const interval = 30000;
-const RENDER_URL = process.env.RENDER_URL || `https://social-network-webrtc.onrender.com`;
+const RENDER_URL = process.env.RENDER_URL || `https://social-network-webrtc.onrender.com/api/health`;
 
 function reloadWebsite() {
   axios
@@ -70,8 +70,8 @@ app.use(cookieParser());
 
 const port = process.env.PORT;
 
-// Health check endpoint
-app.get("/", (req, res) => {
+// Health check endpoint for monitoring
+app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "ok", message: "Server is running" });
 });
 
