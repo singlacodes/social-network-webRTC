@@ -73,7 +73,6 @@ export const loginUser = TryCatch(async (req, res) => {
   });
 });
 
-
 export const logoutUser = TryCatch((req, res) => {
   res.cookie("token", "", { maxAge: 0 });
 

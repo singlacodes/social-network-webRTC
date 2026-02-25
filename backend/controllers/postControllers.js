@@ -80,7 +80,7 @@ export const getAllPosts = TryCatch(async (req, res) => {
     });
 
   res.json({ posts, reels });
-}); 
+});
 
 export const likeUnlikePost = TryCatch(async (req, res) => {
   const post = await Post.findById(req.params.id);
@@ -110,6 +110,7 @@ export const likeUnlikePost = TryCatch(async (req, res) => {
     });
   }
 });
+
 export const commentonPost = TryCatch(async (req, res) => {
   const post = await Post.findById(req.params.id);
 
@@ -138,7 +139,6 @@ export const deleteComment = TryCatch(async (req, res) => {
     return res.status(404).json({
       message: "No Post with this id",
     });
-
 
   if (!req.query.commentId)
     return res.status(404).json({
@@ -175,7 +175,6 @@ export const deleteComment = TryCatch(async (req, res) => {
   }
 });
 
-
 export const editCaption = TryCatch(async (req, res) => {
   const post = await Post.findById(req.params.id);
 
@@ -197,5 +196,3 @@ export const editCaption = TryCatch(async (req, res) => {
     message: "post updated",
   });
 });
-
-

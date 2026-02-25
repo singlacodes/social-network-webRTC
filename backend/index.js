@@ -46,6 +46,51 @@ app.use(express.json());
 app.use(cookieParser());
 
 const port = process.env.PORT;
+
+// to get all chats of user
+app.get("/api/messages/chats", isAuth, async (req, res) => {
+  try {
+    const chats = await Chat.find({
+      users: req.user._id,
+    }).populate({
+      path: "users",
+      select: "name profilePic",
+    });
+
+    chats.forEach((e) => {
+      e.users = e.users.filter(
+        (user) => user._id.toString() !== req.user._id.toString()
+      );
+    });
+
+    res.json(chats);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
+// to get all users
+app.get("/api/user/all", isAuth, async (req, res) => {
+  try {
+    const search = req.query.search || "";
+    const users = await User.find({
+      name: {
+        $regex: search,
+        $options: "i",
+      },
+      _id: { $ne: req.user._id },
+    }).select("-password");
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
 // importing routes
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
