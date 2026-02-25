@@ -26,12 +26,12 @@ const Chat = ({ chat, setSelectedChat, isOnline }) => {
           </div>
 
           <span className="flex justify-center items-center gap-1">
-            {loggedInUser && chat.latestMessage && loggedInUser._id === chat.latestMessage.sender ? (
+            {loggedInUser && chat.latestMessage && chat.latestMessage.sender && loggedInUser._id === chat.latestMessage.sender ? (
               <BsSendCheck />
             ) : (
               ""
             )}
-            {chat.latestMessage && chat.latestMessage.text.slice(0, 18)}...
+            {chat.latestMessage && chat.latestMessage.text && chat.latestMessage.text.slice(0, 18)}...
           </span>
         </div>
       )}

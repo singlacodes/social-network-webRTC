@@ -98,7 +98,7 @@ const ChatPage = ({ user }) => {
                     key={e._id}
                     chat={e}
                     setSelectedChat={setSelectedChat}
-                    isOnline={onlineUsers.includes(e.users[0]._id)}
+                    isOnline={e.users && e.users[0] && onlineUsers.includes(e.users[0]._id)}
                   />
                 ))}
               </div>
@@ -107,7 +107,7 @@ const ChatPage = ({ user }) => {
         </div>
         {selectedChat === null ? (
           <div className="w-[70%] mx-20 mt-40 text-2xl">
-            Hello 👋 {user.name} select a chat to start conversation
+            Hello 👋 {user?.name} select a chat to start conversation
           </div>
         ) : (
           <div className="w-[70%]">

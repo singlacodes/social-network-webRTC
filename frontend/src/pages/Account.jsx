@@ -20,12 +20,12 @@ const Account = ({ user }) => {
   let myPosts;
 
   if (posts && user) {
-    myPosts = posts.filter((post) => post.owner._id === user._id);
+    myPosts = posts.filter((post) => post.owner && post.owner._id === user._id);
   }
   let myReels;
 
   if (reels && user) {
-    myReels = reels.filter((reel) => reel.owner._id === user._id);
+    myReels = reels.filter((reel) => reel.owner && reel.owner._id === user._id);
   }
 
   const [type, setType] = useState("post");
@@ -58,6 +58,7 @@ const Account = ({ user }) => {
   const [followingsData, setFollowingsData] = useState([]);
 
   async function followData() {
+    if (!user?._id) return;
     try {
       const { data } = await axios.get("/api/user/followdata/" + user._id);
 
@@ -76,6 +77,7 @@ const Account = ({ user }) => {
   };
 
   const changleImageHandler = () => {
+    if (!user?._id || !file) return;
     const formdata = new FormData();
 
     formdata.append("file", file);
@@ -88,9 +90,10 @@ const Account = ({ user }) => {
   }, [user]);
 
   const [showInput, setShowInput] = useState(false);
-  const [name, setName] = useState(user.name ? user.name : "");
+  const [name, setName] = useState(user?.name || "");
 
   const UpdateName = () => {
+    if (!user?._id) return;
     updateProfileName(user._id, name, setShowInput);
   };
 
@@ -100,6 +103,7 @@ const Account = ({ user }) => {
 
   async function updatePassword(e) {
     e.preventDefault();
+    if (!user?._id) return;
     try {
       const { data } = await axios.post("/api/user/" + user._id, {
         oldPassword,

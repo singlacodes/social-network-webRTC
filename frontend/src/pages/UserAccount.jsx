@@ -41,12 +41,12 @@ const UserAccount = ({ user: loggedInUser }) => {
   let myPosts;
 
   if (posts && user) {
-    myPosts = posts.filter((post) => post.owner._id === user._id);
+    myPosts = posts.filter((post) => post.owner && post.owner._id === user._id);
   }
   let myReels;
 
   if (reels && user) {
-    myReels = reels.filter((reel) => reel.owner._id === user._id);
+    myReels = reels.filter((reel) => reel.owner && reel.owner._id === user._id);
   }
 
   const [type, setType] = useState("post");
@@ -73,14 +73,15 @@ const UserAccount = ({ user: loggedInUser }) => {
   const { followUser } = UserData();
 
   const followHandler = () => {
+    if (!user?._id) return;
     setFollowed(!followed);
     followUser(user._id, fetchUser);
   };
 
-  const followers = user.followers;
+  const followers = user?.followers;
 
   useEffect(() => {
-    if (followers && followers.includes(loggedInUser._id)) setFollowed(true);
+    if (followers && loggedInUser?._id && followers.includes(loggedInUser._id)) setFollowed(true);
   }, [user]);
 
   const [show, setShow] = useState(false);
@@ -89,8 +90,7 @@ const UserAccount = ({ user: loggedInUser }) => {
   const [followersData, setFollowersData] = useState([]);
   const [followingsData, setFollowingsData] = useState([]);
 
-  async function followData() {
-    try {
+  async function followData() {    if (!user?._id) return;    try {
       const { data } = await axios.get("/api/user/followdata/" + user._id);
 
       setFollowersData(data.followers);
@@ -140,7 +140,7 @@ const UserAccount = ({ user: loggedInUser }) => {
                   <div className="flex flex-col gap-2">
                     <p className="flex justify-center items-center text-gray-800 font-semibold">
                       {user.name}{" "}
-                      {onlineUsers.includes(user._id) && (
+                      {onlineUsers && user._id && onlineUsers.includes(user._id) && (
                         <div className="ml-5 ">
                           <span className="font-bold text-green-400">
                             Online
@@ -154,16 +154,16 @@ const UserAccount = ({ user: loggedInUser }) => {
                       className="text-gray-500 text-sm cursor-pointer"
                       onClick={() => setShow(true)}
                     >
-                      {user.followers.length} follower
+                      {user.followers?.length || 0} follower
                     </p>
                     <p
                       className="text-gray-500 text-sm cursor-pointer"
                       onClick={() => setShow1(true)}
                     >
-                      {user.followings.length} following
+                      {user.followings?.length || 0} following
                     </p>
 
-                    {user._id === loggedInUser._id ? (
+                    {user._id && loggedInUser?._id && user._id === loggedInUser._id ? (
                       ""
                     ) : (
                       <button

@@ -22,7 +22,7 @@ const PostCard = ({ type, value }) => {
   const formatDate = format(new Date(value.createdAt), "MMMM do");
 
   useEffect(() => {
-    if (!user?._id) return;
+    if (!user?._id || !value?.likes) return;
     
     for (let i = 0; i < value.likes.length; i++) {
       if (value.likes[i] === user._id) setIsLike(true);
@@ -84,6 +84,11 @@ const PostCard = ({ type, value }) => {
 
   const { onlineUsers } = SocketData();
 
+  // Safety check: if value.owner is null/undefined, don't render
+  if (!value || !value.owner) {
+    return null;
+  }
+
   return (
     <div className="bg-gray-100 flex items-center justify-center pt-3 pb-14">
       <SimpleModal isOpen={showModal} onClose={closeModal}>
@@ -111,22 +116,22 @@ const PostCard = ({ type, value }) => {
             to={`/user/${value.owner._id}`}
           >
             <img
-              src={value.owner.profilePic.url}
+              src={value.owner?.profilePic?.url}
               alt=""
               className="w-8 h-8 rounded-full"
             />
 
-            {onlineUsers.includes(value.owner._id) && (
+            {onlineUsers && value.owner?._id && onlineUsers.includes(value.owner._id) && (
               <div className="text-5xl font-bold text-green-400">.</div>
             )}
 
             <div>
-              <p className="text-gray-800 font-semibold">{value.owner.name}</p>
+              <p className="text-gray-800 font-semibold">{value.owner?.name}</p>
               <div className="text-gray-500 text-sm">{formatDate}</div>
             </div>
           </Link>
 
-          {user && value.owner._id === user._id && (
+          {user && user._id && value.owner?._id && value.owner._id === user._id && (
             <div className="text-gray-500 cursor-pointer">
               <button
                 onClick={() => setShowModal(true)}
@@ -235,7 +240,7 @@ const PostCard = ({ type, value }) => {
                   value={e}
                   key={e._id}
                   user={user}
-                  owner={value.owner._id}
+                  owner={value.owner?._id}
                   id={value._id}
                 />
               ))
@@ -257,25 +262,31 @@ export const Comment = ({ value, user, owner, id }) => {
   const deleteCommentHandler = () => {
     deleteComment(id, value._id);
   };
+  
+  // Safety check
+  if (!value || !value.user) {
+    return null;
+  }
+  
   return (
     <div className="flex items-center space-x-2 mt-2">
-      <Link to={`/user/${value.user._id}`}>
+      <Link to={`/user/${value.user?._id}`}>
         <img
-          src={value.user.profilePic.url}
+          src={value.user?.profilePic?.url}
           className="w-8 h-8 rounded-full"
           alt=""
         />
       </Link>
       <div>
-        <p className="text-gray-800 font-semibold">{value.user.name}</p>
+        <p className="text-gray-800 font-semibold">{value.user?.name}</p>
         <p className="text-gray-500 text-sm">{value.comment}</p>
       </div>
 
-      {user && owner === user._id ? (
+      {user && user._id && owner === user._id ? (
         ""
       ) : (
         <>
-          {user && value.user._id === user._id && (
+          {user && user._id && value.user?._id && value.user._id === user._id && (
             <button onClick={deleteCommentHandler} className="text-red-500">
               <MdDelete />
             </button>
@@ -283,7 +294,7 @@ export const Comment = ({ value, user, owner, id }) => {
         </>
       )}
 
-      {user && owner === user._id && (
+      {user && user._id && owner && owner === user._id && (
         <button onClick={deleteCommentHandler} className="text-red-500">
           <MdDelete />
         </button>

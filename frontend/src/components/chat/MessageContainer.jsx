@@ -13,6 +13,8 @@ const MessageContainer = ({ selectedChat, setChats }) => {
   const { socket } = SocketData();
 
   useEffect(() => {
+    if (!socket || !selectedChat) return;
+    
     socket.on("newMessage", (message) => {
       if (selectedChat._id === message.chatId) {
         setMessages((prev) => [...prev, message]);
@@ -39,6 +41,8 @@ const MessageContainer = ({ selectedChat, setChats }) => {
   }, [socket, selectedChat, setChats]);
 
   async function fetchMessages() {
+    if (!selectedChat || !selectedChat.users || !selectedChat.users[0]) return;
+    
     setLoading(true);
     try {
       const { data } = await axios.get(
@@ -56,7 +60,9 @@ const MessageContainer = ({ selectedChat, setChats }) => {
   console.log(messages);
 
   useEffect(() => {
-    fetchMessages();
+    if (selectedChat) {
+      fetchMessages();
+    }
   }, [selectedChat]);
 
   const messageContainerRef = useRef(null);
@@ -73,11 +79,11 @@ const MessageContainer = ({ selectedChat, setChats }) => {
         <div className="flex flex-col">
           <div className="flex w-full h-12 items-center gap-3">
             <img
-              src={selectedChat.users[0].profilePic.url}
+              src={selectedChat.users[0]?.profilePic?.url}
               className="w-8 h-8 rounded-full"
               alt=""
             />
-            <span>{selectedChat.users[0].name}</span>
+            <span>{selectedChat.users[0]?.name}</span>
           </div>
           {loading ? (
             <LoadingAnimation />
@@ -92,7 +98,7 @@ const MessageContainer = ({ selectedChat, setChats }) => {
                     <Message
                       key={e._id}
                       message={e.text}
-                      ownMessage={user && e.sender === user._id && true}
+                      ownMessage={user && user._id && e.sender === user._id}
                     />
                   ))}
               </div>
