@@ -135,9 +135,13 @@ const __dirname = path.resolve();
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-// Catch-all route for production - serve React app for any non-API routes
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+// Serve React app for any route that doesn't match API endpoints
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+  } else {
+    next();
+  }
 });
 
 server.listen(port, () => {
