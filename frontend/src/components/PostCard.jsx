@@ -22,10 +22,12 @@ const PostCard = ({ type, value }) => {
   const formatDate = format(new Date(value.createdAt), "MMMM do");
 
   useEffect(() => {
+    if (!user?._id) return;
+    
     for (let i = 0; i < value.likes.length; i++) {
       if (value.likes[i] === user._id) setIsLike(true);
     }
-  }, [value, user._id]);
+  }, [value, user?._id]);
 
   const likeHandler = () => {
     setIsLike(!isLike);
@@ -124,7 +126,7 @@ const PostCard = ({ type, value }) => {
             </div>
           </Link>
 
-          {value.owner._id === user._id && (
+          {user && value.owner._id === user._id && (
             <div className="text-gray-500 cursor-pointer">
               <button
                 onClick={() => setShowModal(true)}
@@ -269,11 +271,11 @@ export const Comment = ({ value, user, owner, id }) => {
         <p className="text-gray-500 text-sm">{value.comment}</p>
       </div>
 
-      {owner === user._id ? (
+      {user && owner === user._id ? (
         ""
       ) : (
         <>
-          {value.user._id === user._id && (
+          {user && value.user._id === user._id && (
             <button onClick={deleteCommentHandler} className="text-red-500">
               <MdDelete />
             </button>
@@ -281,7 +283,7 @@ export const Comment = ({ value, user, owner, id }) => {
         </>
       )}
 
-      {owner === user._id && (
+      {user && owner === user._id && (
         <button onClick={deleteCommentHandler} className="text-red-500">
           <MdDelete />
         </button>

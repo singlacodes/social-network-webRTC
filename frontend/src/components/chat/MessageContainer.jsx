@@ -92,7 +92,7 @@ const MessageContainer = ({ selectedChat, setChats }) => {
                     <Message
                       key={e._id}
                       message={e.text}
-                      ownMessage={e.sender === user._id && true}
+                      ownMessage={user && e.sender === user._id && true}
                     />
                   ))}
               </div>

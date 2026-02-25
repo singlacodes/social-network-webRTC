@@ -19,12 +19,12 @@ const Account = ({ user }) => {
 
   let myPosts;
 
-  if (posts) {
+  if (posts && user) {
     myPosts = posts.filter((post) => post.owner._id === user._id);
   }
   let myReels;
 
-  if (reels) {
+  if (reels && user) {
     myReels = reels.filter((reel) => reel.owner._id === user._id);
   }
 
